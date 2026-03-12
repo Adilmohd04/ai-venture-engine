@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment files (contain API keys)
+.env
+
+# Build output
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kiro specs
+.kiro/
+*.config.kiro
+
+# Markdown docs (keep only code)
+*.md
+
+# Text files except requirements
+*.txt
+!requirements.txt
+
+# SQL migrations tracked separately
+# *.sql
