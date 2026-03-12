@@ -29,7 +29,7 @@ export default function PublicReportPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/report/${analysisId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'https://ai-venture-engine.onrender.com'}/report/${analysisId}`);
       if (res.ok) {
         setReport(await res.json());
       } else if (res.status === 404) {

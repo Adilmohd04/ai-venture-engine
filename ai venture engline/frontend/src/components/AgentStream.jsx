@@ -5,6 +5,8 @@ import remarkGfm from 'remark-gfm';
 import { getAuthToken } from "../lib/supabase";
 import PriorityBadge from "./PriorityBadge";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-venture-engine.onrender.com";
+
 const AGENT_META = {
   research:       { name: "Research Agent",  avatar: "🔎", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
   bull:           { name: "Bull Analyst",    avatar: "📈", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
@@ -64,7 +66,7 @@ export default function AgentStream({ analysisId, onComplete }) {
     let es;
     (async () => {
       const token = await getAuthToken();
-      es = new EventSource(`/stream-analysis?analysis_id=${analysisId}&token=${token}`);
+      es = new EventSource(`${API_URL}/stream-analysis?analysis_id=${analysisId}&token=${token}`);
 
       es.addEventListener("analysis_start", (e) => {
         try {

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 const AuthContext = createContext({});
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-venture-engine.onrender.com";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

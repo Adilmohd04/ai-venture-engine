@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Check, X, Shield, Zap, Sparkles } from "lucide-react";
 
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-venture-engine.onrender.com";
 
 export default function PricingPage() {
   const { profile, user } = useAuth();
