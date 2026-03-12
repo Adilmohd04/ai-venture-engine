@@ -67,6 +67,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://ai-venture-engine.vercel.app",
+        "https://ventureengine.in",
+        "https://www.ventureengine.in",
     ],
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
@@ -616,8 +618,8 @@ async def create_paypal_order(
             "intent": "sale",
             "payer": {"payment_method": "paypal"},
             "redirect_urls": {
-                "return_url": f"http://localhost:5173/dashboard?payment=success",
-                "cancel_url": f"http://localhost:5173/dashboard?payment=cancelled"
+                "return_url": f"https://ventureengine.in/dashboard?payment=success",
+                "cancel_url": f"https://ventureengine.in/dashboard?payment=cancelled"
             },
             "transactions": [{
                 "amount": {
