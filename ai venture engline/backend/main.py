@@ -99,6 +99,21 @@ async def _get_user(authorization: Optional[str] = Header(None)) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Health check endpoint (no auth required)
+# ---------------------------------------------------------------------------
+@app.get("/health")
+async def health_check():
+    """Simple health check endpoint for monitoring services."""
+    return {"status": "healthy", "service": "AI Venture Intelligence Engine"}
+
+
+@app.get("/")
+async def root():
+    """Root endpoint."""
+    return {"message": "AI Venture Intelligence Engine API", "status": "running"}
+
+
+# ---------------------------------------------------------------------------
 # Auth-aware endpoints
 # ---------------------------------------------------------------------------
 @app.get("/api/profile")
