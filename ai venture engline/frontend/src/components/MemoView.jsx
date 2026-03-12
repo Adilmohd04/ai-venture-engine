@@ -49,6 +49,90 @@ export default function MemoView({ memo, onDownloadPdf }) {
         </motion.div>
       )}
 
+      {/* Deal Breakers - Top 3 Critical Issues */}
+      {memo.deal_breakers && memo.deal_breakers.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <Section title="🚨 Deal Breakers">
+            <div className="bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-300 rounded-2xl p-6">
+              <p className="text-slate-700 text-sm mb-6 font-medium">
+                These are the top {memo.deal_breakers.length} critical issues that could prevent investment:
+              </p>
+              <div className="space-y-4">
+                {memo.deal_breakers.map((breaker, i) => (
+                  <div key={i} className="bg-white border-2 border-rose-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-4 mb-3">
+                      <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        {breaker.rank || i + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-slate-900 font-bold text-lg mb-1">{breaker.issue}</h4>
+                        <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-bold ${
+                          breaker.severity === "critical" 
+                            ? "bg-rose-100 text-rose-700 border border-rose-300" 
+                            : breaker.severity === "high"
+                            ? "bg-orange-100 text-orange-700 border border-orange-300"
+                            : "bg-amber-100 text-amber-700 border border-amber-300"
+                        }`}>
+                          {breaker.severity?.toUpperCase() || "HIGH"} SEVERITY
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-slate-700 text-sm leading-relaxed mb-3 pl-12">
+                      {breaker.explanation}
+                    </p>
+                    <div className="pl-12 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                      <div className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">
+                        💡 How to fix:
+                      </div>
+                      <p className="text-slate-700 text-sm leading-relaxed">
+                        {breaker.recommendation}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Section>
+        </motion.div>
+      )}
+
+      {/* Investor Questions - Tough Questions VCs Will Ask */}
+      {memo.investor_questions && memo.investor_questions.length > 0 && (
+        <motion.div variants={itemVariants}>
+          <Section title="❓ Tough Questions VCs Will Ask">
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-2xl p-6">
+              <p className="text-slate-700 text-sm mb-6 font-medium">
+                Prepare answers to these {memo.investor_questions.length} critical questions before your pitch:
+              </p>
+              <div className="space-y-4">
+                {memo.investor_questions.map((question, i) => (
+                  <div key={i} className="bg-white border-2 border-indigo-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        {i + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-slate-900 font-semibold text-base leading-relaxed">
+                          {question}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 bg-white border border-indigo-200 rounded-xl p-4">
+                <p className="text-slate-600 text-sm flex items-start gap-2">
+                  <Info className="w-4 h-4 shrink-0 mt-0.5 text-indigo-500" />
+                  <span>
+                    <strong className="text-slate-900">Pro tip:</strong> Practice answering these questions with data-backed responses. VCs expect specific metrics, not vague promises.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </Section>
+        </motion.div>
+      )}
+
       {/* Slide-by-Slide Feedback */}
       {memo.slide_feedback && (
         <motion.div variants={itemVariants}>
