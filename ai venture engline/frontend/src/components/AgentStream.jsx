@@ -108,7 +108,16 @@ export default function AgentStream({ analysisId, onComplete }) {
       es.addEventListener("error", (e) => {
         try { const d = JSON.parse(e.data); setError(d.message); } catch { setError("Connection lost. Trying to reconnect..."); }
       });
-      es.onerror = () => { /* let browser reconnect */ };
+      
+      es.onerror = () => {
+        setError("Connection lost. Trying to reconnect...");
+        // EventSource will auto-reconnect, but if it fails repeatedly, show error
+        setTimeout(() => {
+          if (es.readyState === EventSource.CLOSED) {
+            setError("Unable to reconnect. Please refresh the page or try again later.");
+          }
+        }, 10000); // Wait 10 seconds before showing permanent error
+      };
 
     })();
     return () => { if (es) es.close(); };
