@@ -1,31 +1,46 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://uufabvwilnxktnpygtkq.supabase.co";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1ZmFidndpbG54a3RucHlndGtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMjMwODQsImV4cCI6MjA4ODY5OTA4NH0.5o7nbKNOGb6G9aysA7qeexBGAmy7787kj1FwiGY50gA";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error(
+    "Missing Supabase environment variables. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file."
+  );
+}
+
+export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "", {
+  auth: {
+    flowType: "pkce",
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
 const API_URL = import.meta.env.VITE_API_URL || "https://ai-venture-engine.onrender.com";
 
 export async function getAuthToken() {
-  const { data } = await supabase.auth.getSession();
-  return data?.session?.access_token || null;
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data?.session?.access_token || null;
+  } catch (err) {
+    console.error("Failed to get auth token:", err);
+    return null;
+  }
 }
 
 export async function authFetch(url, options = {}) {
   const token = await getAuthToken();
   if (!token) throw new Error("Not authenticated");
-  
-  // Prepend API_URL if url doesn't start with http
+
   const fullUrl = url.startsWith("http") ? url : `${API_URL}${url}`;
-  
+
   const headers = { ...options.headers, Authorization: `Bearer ${token}` };
-  
-  // Do not set Content-Type to application/json if sending FormData
+
   if (!(options.body instanceof FormData) && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
-  
+
   return fetch(fullUrl, {
     ...options,
     headers,

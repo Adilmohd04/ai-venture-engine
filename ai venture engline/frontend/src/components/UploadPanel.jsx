@@ -1,13 +1,26 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { authFetch } from "../lib/supabase";
 import { UploadCloud, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+
+const COLD_START_DELAY_MS = 5000;
+const UPLOAD_TIMEOUT_MS = 60000;
 
 export default function UploadPanel({ onUploadComplete }) {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [slowUpload, setSlowUpload] = useState(false);
   const inputRef = useRef(null);
+  const coldStartTimer = useRef(null);
+  const uploadTimeoutTimer = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (coldStartTimer.current) clearTimeout(coldStartTimer.current);
+      if (uploadTimeoutTimer.current) clearTimeout(uploadTimeoutTimer.current);
+    };
+  }, []);
 
   const validate = (file) => {
     if (!file.name.toLowerCase().endsWith(".pdf")) return "Only PDF files are accepted.";
@@ -20,10 +33,24 @@ export default function UploadPanel({ onUploadComplete }) {
     if (err) { setError(err); return; }
     setError(null);
     setUploading(true);
+    setSlowUpload(false);
+
+    // Show cold-start message after 5s
+    coldStartTimer.current = setTimeout(() => setSlowUpload(true), COLD_START_DELAY_MS);
+
+    // Abort if upload takes too long
+    const controller = new AbortController();
+    uploadTimeoutTimer.current = setTimeout(() => {
+      controller.abort();
+      setError("Upload timed out. The server may be starting up — please try again in a moment.");
+      setUploading(false);
+      setSlowUpload(false);
+    }, UPLOAD_TIMEOUT_MS);
+
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await authFetch("/upload", { method: "POST", body: form });
+      const res = await authFetch("/upload", { method: "POST", body: form, signal: controller.signal });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.detail || `Upload failed (${res.status})`);
@@ -31,9 +58,12 @@ export default function UploadPanel({ onUploadComplete }) {
       const { analysis_id } = await res.json();
       onUploadComplete(analysis_id);
     } catch (e) {
-      setError(e.message);
+      if (e.name !== "AbortError") setError(e.message);
     } finally {
+      clearTimeout(coldStartTimer.current);
+      clearTimeout(uploadTimeoutTimer.current);
       setUploading(false);
+      setSlowUpload(false);
     }
   };
 
@@ -88,7 +118,11 @@ export default function UploadPanel({ onUploadComplete }) {
                   </div>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Extracting Intelligence...</h3>
-                <p className="text-slate-600 text-sm">Parsing PDF structure, text, and layout.</p>
+                <p className="text-slate-600 text-sm">
+                  {slowUpload
+                    ? "Backend is waking up, this may take a moment..."
+                    : "Parsing PDF structure, text, and layout."}
+                </p>
               </motion.div>
             ) : (
               <motion.div 
